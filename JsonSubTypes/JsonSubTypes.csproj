@@ -20,6 +20,7 @@
     <AssemblyVersion>1.5.2.0</AssemblyVersion>
     <RepositoryType>git</RepositoryType>
     <PackageReleaseNotes>See in https://github.com/manuc66/JsonSubTypes/releases</PackageReleaseNotes>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />

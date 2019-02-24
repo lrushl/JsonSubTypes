@@ -72,7 +72,7 @@ namespace JsonSubTypes
         {
             get
             {
-                if (!_isInsideRead)
+                if (!_isInsideRead || _reader == null)
                     return true;
 
                 return !string.IsNullOrEmpty(_reader.Path);
@@ -211,15 +211,15 @@ namespace JsonSubTypes
             return GetTypeFromDiscriminatorValue(jObject, parentType);
         }
 
-        private static Type GetTypeByPropertyPresence(IDictionary<string, JToken> jObject, Type parentType)
+        private Type GetTypeByPropertyPresence(IDictionary<string, JToken> jObject, Type parentType)
         {
-            var knownSubTypeAttributes = GetAttributes<KnownSubTypeWithPropertyAttribute>(parentType);
-
+            var knownSubTypeAttributes = GetTypesByPropertyPresence(parentType);
+            
             return knownSubTypeAttributes
                 .Select(knownType =>
                 {
-                    if (TryGetValueInJson(jObject, knownType.PropertyName, out var _))
-                        return knownType.SubType;
+                    if (TryGetValueInJson(jObject, knownType.Key, out var _))
+                        return knownType.Value;
 
                     return null;
                 })
@@ -291,6 +291,12 @@ namespace JsonSubTypes
                 return targetType;
 
             return null;
+        }
+        
+        private protected virtual Dictionary<string, Type> GetTypesByPropertyPresence(Type parentType)
+        {
+            return GetAttributes<KnownSubTypeWithPropertyAttribute>(parentType)
+                .ToDictionary(a => a.PropertyName, a => a.SubType);
         }
 
         protected virtual Dictionary<object, Type> GetSubTypeMapping(Type type)
